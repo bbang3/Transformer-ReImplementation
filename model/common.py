@@ -5,11 +5,10 @@ class PositionalEncoding(nn.Module):
     def __init__(self, max_len, embed_dim, device) -> None:
         super(PositionalEncoding, self).__init__()
 
-        self.encoding = self._get_encoding(max_len, embed_dim)
+        self.encoding = self._get_encoding(max_len, embed_dim, device)
 
     def forward(self, x: torch.tensor):
-        batch_size, seq_len = x.shape
-
+        batch_size, seq_len, embed_dim = x.shape
         return self.encoding[:seq_len, :]
 
     def _get_encoding(self, max_len, embed_dim, device):
@@ -40,7 +39,7 @@ class LayerNorm(nn.Module):
         mean = x.mean(dim=-1, keepdim=True)
         std = x.std(dim=-1, keepdim=True)
         
-        out = (x - mean) / (std + self.eps)
+        out = (x - mean) / (std + self.eps) # broadcast so that out shape is same as x
         out = self.gamma * out + self.beta
 
         return out
