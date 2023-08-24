@@ -1,29 +1,22 @@
 import torch
 import os
 from torch.utils.data import Dataset
-from tokenizers import CharBPETokenizer
+from tokenizers import Tokenizer
+from tokenizers.models import BPE
+from tokenizers.trainers import BpeTrainer
+from tokenizers.pre_tokenizers import Whitespace
+
 
 class TranslationDataset(Dataset):
     def __init__(self, path, split, src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256) -> None:
         super().__init__()
-        
         src_lang, tgt_lang = language_pair.split('-')
-
-        full_path = os.path.join(path, f'{split}.{src_lang}')
-        with open(full_path, 'r', encoding='utf-8') as f:
-            sents = f.readlines()
-        src_sents = [sent.rstrip() for sent in sents]
-
-        full_path = os.path.join(path, f'{split}.{tgt_lang}')
-        with open(full_path, 'r', encoding='utf-8') as f:
-            sents = f.readlines()
-        tgt_sents = [sent.rstrip() for sent in sents]
-    
-        self.src_sents = src_sents
-        self.tgt_sents = tgt_sents
 
         self.src_tokenizer = src_tokenizer
         self.tgt_tokenizer = tgt_tokenizer
+    
+        self.src_sents = self._read_sentences(path, split, src_lang)
+        self.tgt_sents = self._read_sentences(path, split, tgt_lang)
 
         self.max_length = max_length
     
@@ -37,13 +30,19 @@ class TranslationDataset(Dataset):
         src_token = self.src_tokenizer.encode(src_sent).ids
         tgt_token = self.tgt_tokenizer.encode(tgt_sent).ids
 
+        label = tgt_token + [self.tgt_tokenizer.token_to_id('[EOS]')] # label은 [BOS] 토큰을 제외
+        tgt_token = [self.tgt_tokenizer.token_to_id('[BOS]')] + tgt_token # decoder input은 [EOS] 토큰을 제외
+
         return {
-            'input': torch.tensor(src_token),
-            'output': torch.tensor(tgt_token)
+            'src': torch.LongTensor(src_token),
+            'tgt': torch.LongTensor(tgt_token),
+            'label': torch.LongTensor(label)
         }
     
-    def _init_tokenizer(self, tokenizer_path):
-        tokenizer = CharBPETokenizer(tokenizer_path)
-        tokenizer.enable_truncation(max_length=self.max_length)
-        tokenizer.enable_padding(length=self.max_length)
-        return tokenizer
+    def _read_sentences(self, path, split, lang):
+        file_name = f'{split}.{lang}'
+        full_path = os.path.join(path, file_name)
+        with open(full_path, 'r', encoding='utf-8') as f:
+            sents = f.readlines()
+        sents = [sent.rstrip() for sent in sents]
+        return sents
