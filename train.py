@@ -3,7 +3,7 @@ import numpy as np
 
 from tokenizer import prepare_tokenizer
 
-def train(model, optimizer, criterion, train_loader, device, num_epochs=10):
+def train(model, optimizer, criterion, train_loader, device, tgt_tokenizer, num_epochs=10):
     model.train()
     losses = []
 
@@ -15,6 +15,8 @@ def train(model, optimizer, criterion, train_loader, device, num_epochs=10):
                 enc_inputs, dec_inputs, labels = batch['src'], batch['tgt'], batch['label'] # (bs, seq_len)
                 outputs = model(enc_inputs, dec_inputs) # (bs, seq_len, dec_vocab_size)
 
+                decoded = tgt_tokenizer.decode(outputs[0].argmax(dim=-1).tolist())
+                print(len(decoded), decoded)
                 outputs = outputs.contiguous().view(-1, outputs.shape[-1]) # (bs * seq_len, dec_vocab_size)
                 labels = labels.contiguous().view(-1) # (bs * seq_len)
 
