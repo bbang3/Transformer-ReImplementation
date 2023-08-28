@@ -137,4 +137,3 @@ class DecoderLayer(nn.Module):
         ffn_out = self.norm3(cross_attn_out + ffn_out) # add + layernorm
 
         return ffn_out, self_attn_prob, cross_attn_prob
-    

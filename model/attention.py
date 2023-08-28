@@ -4,7 +4,7 @@ import torch.nn as nn
 class ScaledDotProductAttention(nn.Module):
     def __init__(self):
         super(ScaledDotProductAttention, self).__init__()
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, Q, K, V, mask=None):
         batch_size, num_heads, seq_len, d_k = K.shape # num_heads * d_k = 모든 head를 합친 attention 크기
