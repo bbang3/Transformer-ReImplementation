@@ -4,7 +4,6 @@ import torch.nn as nn
 class PositionalEncoding(nn.Module):
     def __init__(self, max_len, embed_dim, device) -> None:
         super(PositionalEncoding, self).__init__()
-
         self.encoding = self._get_encoding(max_len, embed_dim, device)
 
     def forward(self, x: torch.tensor):
@@ -12,18 +11,19 @@ class PositionalEncoding(nn.Module):
         return self.encoding[:seq_len, :]
 
     def _get_encoding(self, max_len, embed_dim, device):
-        encoding = torch.zeros(max_len, embed_dim, device=device)
+        encoding = torch.zeros(max_len, embed_dim).to(device)
         encoding.requires_grad = False # freeze
-
-        pos = torch.arange(0, max_len, device=device).float()
+        
+        pos = torch.arange(0, max_len).float().to(device)
         pos = pos.unsqueeze(dim=1) # (seq_len, 1)
 
-        _2i = torch.arange(0, embed_dim, step=2).float() # (embed_dim//2,)
+        _2i = torch.arange(0, embed_dim, step=2).float().to(device) # (embed_dim//2,)
 
         # broadcast: (seq_len, 1) / (1, embed_dim//2) => (seq_len, embed_dim//2)
         encoding[:, 0::2] = torch.sin(pos / (10000 ** (_2i / embed_dim))) 
         encoding[:, 1::2] = torch.cos(pos / (10000 ** (_2i / embed_dim)))
 
+        # (seq_len, embed_dim)
         return encoding
 
     
