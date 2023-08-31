@@ -31,9 +31,7 @@ model = Transformer(device=device)
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 criterion = torch.nn.CrossEntropyLoss(ignore_index=tgt_tokenizer.token_to_id("[PAD]"))
 
-wandb.init(
-    project="Transformer-ReImplementation",
-)
+wandb.init(project="Transformer-ReImplementation")
 
 train(model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=10)
 
