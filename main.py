@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import wandb
 
 from tokenizer import prepare_tokenizer
 from dataset import TranslationDataset
@@ -30,4 +31,10 @@ model = Transformer(device=device)
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 criterion = torch.nn.CrossEntropyLoss(ignore_index=tgt_tokenizer.token_to_id("[PAD]"))
 
+wandb.init(
+    project="Transformer-ReImplementation",
+)
+
 train(model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=10)
+
+wandb.finish()

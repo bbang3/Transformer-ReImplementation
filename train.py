@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
 import numpy as np
+import wandb
 
 from tokenizer import prepare_tokenizer
 
@@ -30,8 +31,12 @@ def train(model, optimizer, criterion, train_loader, val_loader, device, tgt_tok
                 loss.backward()
                 optimizer.step()
                 pbar.set_postfix({"loss": np.mean(losses)})
+
+                wandb.log({"train_loss": np.mean(losses)})
         
-        evaluate(model, criterion, val_loader, device, tgt_tokenizer)
+        eval_loss = evaluate(model, criterion, val_loader, device, tgt_tokenizer)
+        wandb.log({"eval_loss": eval_loss})
+
         torch.save(model.state_dict(), f'./checkpoints/model_{epoch}.pt')
         
     return losses
@@ -57,5 +62,6 @@ def evaluate(model, criterion, val_loader, device, tgt_tokenizer):
                 losses.append(loss.item())
  
                 pbar.set_postfix({"val_loss": np.mean(losses)})
-
+            
+    
     return np.mean(losses)
