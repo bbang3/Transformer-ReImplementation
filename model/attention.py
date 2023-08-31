@@ -12,7 +12,6 @@ class ScaledDotProductAttention(nn.Module):
         # inner product of query and key + scaling
         # (bs, num_heads, seq_q, d_k) * (bs, num_heads, d_k, seq_k) => (bs, num_heads, seq_q, seq_k)
         attn_scores = torch.matmul(Q, K.transpose(-1, -2)) / (d_k ** 0.5) 
-    
         # mask: boolean matrix
         if mask is not None:
             attn_scores.masked_fill_(mask, -float('inf')) # fill -inf to masked positions
@@ -44,13 +43,16 @@ class MultiHeadAttention(nn.Module):
         bs = Q.shape[0]
         Q, K, V = self.W_q(Q), self.W_k(K), self.W_v(V)
 
-        # (batch_size, num_heads, seq_len, d_head)
+        # (batch_size, num_heads, seq_q, d_head)
         Q = Q.view(bs, -1, self.num_heads, self.d_head).transpose(1, 2)
+        # (batch_size, num_heads, seq_k, d_head)
         V = V.view(bs, -1, self.num_heads, self.d_head).transpose(1, 2)
+        # (batch_size, num_heads, seq_v, d_head)
         K = K.view(bs, -1, self.num_heads, self.d_head).transpose(1, 2)
-
-        # (bs, seq_len, seq_len) -> (bs, num_heads, seq_len, seq_len)
+        
+        # (bs, seq_q, seq_k) -> (bs, num_heads, seq_q, seq_k)
         mask = mask.unsqueeze(1).expand(bs, self.num_heads, -1, -1)
+
 
         # out: (batch_size, num_heads, seq_len_q, d_head)
         # attn_prob: (bs, num_heads, seq_len_q, seq_len_k)

@@ -107,7 +107,7 @@ class Decoder(nn.Module):
         dec_inputs = self.embedding(dec_inputs)
 
         # (b, seq_len, embed_dim)
-        enc_inputs = dec_inputs + self.pos_encoding(dec_inputs) # input + positional encoding
+        dec_inputs = dec_inputs + self.pos_encoding(dec_inputs) # input + positional encoding
 
         # (b, seq_len, embed_dim)
         for layer in self.layers:
