@@ -30,3 +30,8 @@ def prepare_tokenizer(path, lang, is_target, vocab_size=37000, max_length=256):
 
 
     return tokenizer
+
+def load_tokenizer(path, lang):
+    path = os.path.join(path, f'tokenizer_{lang}.json')
+    tokenizer = Tokenizer.from_file(path)
+    return tokenizer
