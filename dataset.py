@@ -5,7 +5,7 @@ from tokenizers import Tokenizer
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
 from tokenizers.pre_tokenizers import Whitespace
-from torch.nn.functional import pad
+import torch.nn.functional as F
 
 class TranslationDataset(Dataset):
     def __init__(self, path, split, src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256) -> None:
@@ -35,9 +35,9 @@ class TranslationDataset(Dataset):
         assert len(label) <= self.max_length and len(tgt_token) <= self.max_length
 
         pad_value = self.src_tokenizer.token_to_id('[PAD]')
-        src_token = pad(torch.LongTensor(src_token), pad=(0, self.max_length - len(src_token)), mode='constant', value=pad_value)
-        label = pad(torch.LongTensor(label), pad=(0, self.max_length - len(label)), mode='constant', value=pad_value)
-        tgt_token = pad(torch.LongTensor(tgt_token), pad=(0, self.max_length - len(tgt_token)), mode='constant', value=pad_value)
+        src_token = F.pad(torch.LongTensor(src_token), pad=(0, self.max_length - len(src_token)), mode='constant', value=pad_value)
+        label = F.pad(torch.LongTensor(label), pad=(0, self.max_length - len(label)), mode='constant', value=pad_value)
+        tgt_token = F.pad(torch.LongTensor(tgt_token), pad=(0, self.max_length - len(tgt_token)), mode='constant', value=pad_value)
 
         return {
             'src': src_token,
