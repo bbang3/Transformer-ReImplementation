@@ -51,8 +51,9 @@ class Transformer(nn.Module):
     def get_lookhead_mask(self, seq: torch.Tensor):
         batch_size, seq_len = seq.shape
 
-        lookahead_mask = torch.ones((batch_size, seq_len, seq_len)).bool() # (b, seq_len, seq_len)
+        lookahead_mask = torch.ones((batch_size, seq_len, seq_len), device=self.device).bool() # (b, seq_len, seq_len)
         lookahead_mask = lookahead_mask.triu(diagonal=1) # upper triangular part of a matrix(2-D) including diagonal
+
         return lookahead_mask
 
 
@@ -68,12 +69,13 @@ class Encoder(nn.Module):
         inputs = self.embedding(inputs)
 
         # (b, seq_len, embed_dim)
-        enc_inputs = inputs + self.pos_encoding(inputs) # input + positional encoding
+        outputs = inputs + self.pos_encoding(inputs) # input + positional encoding
 
         # (b, seq_len, embed_dim)
         for layer in self.layers:
-            out = layer(enc_inputs, attn_mask) # feed to encoder layers
-        return out
+            outputs, attn_prob = layer(outputs, attn_mask) # feed to encoder layers
+
+        return outputs, attn_prob
     
     
 class EncoderLayer(nn.Module):
@@ -103,16 +105,16 @@ class Decoder(nn.Module):
         self.embedding = nn.Embedding(vocab_size, ffn_dim)
         self.layers = nn.ModuleList([DecoderLayer(ffn_dim, hidden_dim, num_heads, eps, drop_prob) for _ in range(num_layers)])
     
-    def forward(self, dec_inputs, enc_inputs, self_attn_mask=None, cross_attn_mask=None):
+    def forward(self, dec_inputs, enc_outputs, self_attn_mask=None, cross_attn_mask=None):
         dec_inputs = self.embedding(dec_inputs)
 
         # (b, seq_len, embed_dim)
-        dec_inputs = dec_inputs + self.pos_encoding(dec_inputs) # input + positional encoding
+        dec_outputs = dec_inputs + self.pos_encoding(dec_inputs) # input + positional encoding
 
         # (b, seq_len, embed_dim)
         for layer in self.layers:
-            out = layer(dec_inputs, enc_inputs, self_attn_mask=self_attn_mask, cross_attn_mask=cross_attn_mask) # feed to encoder layers
-        return out
+            dec_outputs, self_attn_prob, cross_attn_prob = layer(dec_outputs, enc_outputs, self_attn_mask=self_attn_mask, cross_attn_mask=cross_attn_mask) # feed to decoder layers
+        return dec_outputs, self_attn_prob, cross_attn_prob
     
 
 class DecoderLayer(nn.Module):
