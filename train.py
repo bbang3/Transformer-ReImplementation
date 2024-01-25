@@ -4,11 +4,12 @@ import numpy as np
 import wandb
 import evaluate as hf_evaluate
 from torch.utils.data import DataLoader
+from datetime import datetime
 
 from tokenizer import prepare_tokenizer
 from inference import generate, _generate
 
-def train(model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=1):
+def train(args, model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=1):
     model.train()
     model = model.to(device)
     losses = []
@@ -44,8 +45,8 @@ def train(model, optimizer, criterion, train_loader, val_loader, device, tgt_tok
         except Exception as e:
             print(e)
             wandb.log({"is_error": 1})
-
-        torch.save(model.state_dict(), f'./checkpoints/model_{epoch}.pt')
+        
+        torch.save(model.state_dict(), f'./checkpoints/model_{args.run_name}_{epoch}.pt')
         
     return losses
 
