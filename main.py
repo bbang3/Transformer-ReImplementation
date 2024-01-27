@@ -8,15 +8,19 @@ from tokenizer import prepare_tokenizer, load_tokenizer
 from dataset import TranslationDataset
 from model.transformer import Transformer
 from train import train
+from eval import evaluate
+from inference import test
 
 import argparse
 
 def parse_argument():
     parser = argparse.ArgumentParser(description='Transformer argument description', prefix_chars='--'  )
 
+    parser.add_argument('--mode', type=str, default='train', help='train, eval, or test')
     parser.add_argument('--checkpoint', type=str, default=None, help='checkpoint path')
     parser.add_argument('--tokenizer_path', type=str, default=None, help='tokenizer path')
     parser.add_argument('--data_path', type=str, default='./data', help='data path')
+    parser.add_argument('--output_path', type=str, default='./output', help='output path')
     parser.add_argument('--batch_size', type=int, default=32, help='batch size')
     parser.add_argument('--num_epochs', type=int, default=10, help='number of epochs')
     parser.add_argument('--device', type=str, default='cuda', help='device type')
@@ -27,7 +31,7 @@ def parse_argument():
 
     return args
 
-# python main.py --checkpoint ./checkpoints/model_2.pt --run_name from_epoch_2 --tokenizer_path ./tokenizer --lr 1e-3
+# python main.py --mode train --checkpoint ./checkpoints/model_from_epoch_2_3.pt --run_name from_epoch_3 --tokenizer_path ./tokenizer --lr 1e-4
 if __name__ == "__main__":
     args = parse_argument()
 
@@ -48,6 +52,9 @@ if __name__ == "__main__":
     val_dataset = TranslationDataset(args.data_path, 'validation', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
+    test_dataset = TranslationDataset(args.data_path, 'validation', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
+    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+
     # print(train_dataset[0])
     ex = train_dataset[0]
     print(ex['src'].shape, ex['tgt'].shape)
@@ -58,11 +65,18 @@ if __name__ == "__main__":
         print("Checkpoint is loaded from", args.checkpoint)
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
 
+    print("Learning rate: ", args.lr)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     criterion = torch.nn.CrossEntropyLoss(ignore_index=tgt_tokenizer.token_to_id("[PAD]"))
 
-    wandb.init(project="Transformer-ReImplementation", name=args.run_name)
-
-    train(args, model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=args.num_epochs)
-
-    wandb.finish()
+    if args.mode == 'train':
+        wandb.init(project="Transformer-ReImplementation", name=args.run_name)
+        train(args, model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=args.num_epochs)
+        wandb.finish()
+    elif args.mode == 'eval':
+        eval_loss, bleu = evaluate(model, criterion, val_loader, device, tgt_tokenizer)
+        print(eval_loss, bleu)
+    elif args.mode == 'test':
+        test(model, test_loader, device, tgt_tokenizer, args.output_path)
+    else:
+        raise NotImplementedError("Please choose mode from train, eval, or test")
