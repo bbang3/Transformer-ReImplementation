@@ -4,6 +4,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import evaluate
 import json
+import os
 
 from dataset import TranslationDataset
 from model.transformer import Transformer
@@ -76,36 +77,24 @@ def generate(model, data_loader, device, tgt_tokenizer):
     return predictions
 
 
-def test(model, data_loader, metrics, device, tgt_tokenizer):
+def test(model, data_loader, device, tgt_tokenizer, output_path):
 
     # print(predictions, labels)
     labels = data_loader.dataset.tgt_sents
     predictions = generate(model, data_loader, device, tgt_tokenizer)
 
+    metrics = evaluate.load("bleu")
     result = metrics.compute(predictions=predictions, references=labels)
     print(result)
 
-    with open('./output/output.json', 'w', encoding='utf-8') as f:
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    with open(os.path.join(output_path, 'score.json'), 'w+', encoding='utf-8') as f:
         json.dump(result, f, indent=4, ensure_ascii=False)
 
-    with open('./output/result.de', 'w', encoding='utf-8') as f:
+    with open(os.path.join(output_path, 'output.de'), 'w+', encoding='utf-8') as f:
         for sent in predictions:
             f.write(sent + '\n')
 
-    return
-
-
-if __name__ == "__main__":
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    
-    model = Transformer(device=device)
-    model.load_state_dict(torch.load('./checkpoints/model_10.pt', map_location=device))
-
-    src_tokenizer = load_tokenizer('./tokenizer', 'en')
-    tgt_tokenizer = load_tokenizer('./tokenizer', 'de')
-
-    test_dataset = TranslationDataset('./data', 'dev', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-    bleu = evaluate.load("bleu")
-
-    test(model, test_loader, bleu, device, tgt_tokenizer)
+    return result
