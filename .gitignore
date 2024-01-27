@@ -7,6 +7,9 @@ checkpoints/
 # WandB
 wandb/
 
+# Miscelleaneous ipynb files
+*.ipynb
+
 ######################
 
 # Byte-compiled / optimized / DLL files
