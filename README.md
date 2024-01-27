@@ -7,7 +7,7 @@
 python main.py --mode train
 ```
 ```bash
-python main.py --mode train --checkpoint ./checkpoints/model_5.pt --run_name from_epoch_5 --tokenizer_path ./tokenizer --lr 1e-4
+python main.py --mode train --checkpoint ./checkpoints/model_5.pt --run_name from_epoch_5 --data_path ./data --tokenizer_path ./tokenizer --lr 1e-4
 ```
 ### Evaluate
 ```bash
@@ -18,7 +18,7 @@ python main.py --mode eval
 python main.py --mode test
 ```
 ### Optional Arguments
-|Argument|Description|Default|
+|Argument|Default|Description|
 |:-|:-|-:|
 |--checkpoint|None|Checkpoint path|
 |--tokenizer_path|None|Path of pretrained tokenizer|
