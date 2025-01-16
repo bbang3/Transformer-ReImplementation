@@ -1,13 +1,25 @@
 # Transformer-ReImplementation
 [DMIS](https://dmis.korea.ac.kr/) 연구실에서 진행한 Transformer 모델 재구현 프로젝트입니다. ([Attention is All You Need (2017)](https://proceedings.neurips.cc/paper_files/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html))
 
-## Usage
+## How to run
+
+### Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
 ### Train
 ```bash
 python main.py --mode train
 ```
 ```bash
-python main.py --mode train --checkpoint ./checkpoints/model_5.pt --run_name from_epoch_5 --data_path ./data --tokenizer_path ./tokenizer --lr 1e-4
+python main.py \
+    --mode train \
+    --checkpoint ./checkpoints/model_5.pt \
+    --run_name from_epoch_5 \
+    --data_path ./data \
+    --tokenizer_path ./tokenizer \
+    --lr 1e-4
 ```
 ### Evaluate
 ```bash
@@ -20,7 +32,7 @@ python main.py --mode test
 ### Optional Arguments
 |Argument|Default|Description|
 |:-|:-|-:|
-|--checkpoint|None|Checkpoint path|
+|--checkpoint|None|Checkpoint path to start with|
 |--tokenizer_path|None|Path of pretrained tokenizer|
 |--data_path|./data|Data path of train/val/test|
 |--output_path|./output|Output path (for inference)|
