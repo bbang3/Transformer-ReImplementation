@@ -1,14 +1,9 @@
 import torch
-import numpy as np
 from tqdm import tqdm
-from torch.utils.data import DataLoader
 import evaluate
 import json
 import os
 
-from dataset import TranslationDataset
-from model.transformer import Transformer
-from tokenizer import load_tokenizer
 
 # Generate only one sentence
 def _generate(model, data_loader, device, tgt_tokenizer):
@@ -19,7 +14,7 @@ def _generate(model, data_loader, device, tgt_tokenizer):
     predictions = []
     
     with torch.no_grad():
-        with tqdm(data_loader, total=len(data_loader), desc=f'Test') as pbar:
+        with tqdm(data_loader, total=len(data_loader), desc='Test') as pbar:
             for batch in pbar:
                 batch = {k: v.to(device) for k, v in batch.items()}
 
@@ -52,7 +47,7 @@ def generate(model, data_loader, device, tgt_tokenizer):
     predictions = []
 
     with torch.no_grad():
-        with tqdm(data_loader, total=len(data_loader), desc=f'Test') as pbar:
+        with tqdm(data_loader, total=len(data_loader), desc='Test') as pbar:
             for batch in pbar:
                 batch = {k: v.to(device) for k, v in batch.items()}
 

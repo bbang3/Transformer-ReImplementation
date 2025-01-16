@@ -2,7 +2,6 @@ from tokenizers import Tokenizer
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
 from tokenizers.pre_tokenizers import Whitespace
-from tokenizers.processors import TemplateProcessing
 import os
 
 def prepare_tokenizer(path, lang, is_target, vocab_size=37000, max_length=256):

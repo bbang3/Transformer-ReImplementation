@@ -1,24 +1,22 @@
 import torch
 import torch.nn as nn
-import numpy as np
-import sys
 
 from model.attention import MultiHeadAttention
 from model.common import PositionalEncoding, LayerNorm, PositionwiseFFN
 
 class Transformer(nn.Module):
     def __init__(self, 
-                 enc_vocab_size=37000, 
-                 dec_vocab_size=37000,
-                 num_layers=6, 
-                 max_len=256, 
-                 embed_dim=512, 
-                 ffn_dim=2048, 
-                 num_heads=8, 
-                 eps=1e-5, 
-                 drop_prob=0.1, 
-                 device='cpu'
-                 ):
+                enc_vocab_size=37000, 
+                dec_vocab_size=37000,
+                num_layers=6, 
+                max_len=256, 
+                embed_dim=512, 
+                ffn_dim=2048, 
+                num_heads=8, 
+                eps=1e-5, 
+                drop_prob=0.1, 
+                device='cpu'
+                ):
         super(Transformer, self).__init__()
 
         self.encoder = Encoder(enc_vocab_size, num_layers, max_len, embed_dim, ffn_dim, num_heads, eps, drop_prob, device)

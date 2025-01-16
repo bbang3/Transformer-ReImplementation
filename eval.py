@@ -2,9 +2,8 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import numpy as np
-import wandb
 import evaluate as hf_evaluate
-from inference import generate, _generate
+from inference import generate
 
 def evaluate(model, criterion, val_loader, device, tgt_tokenizer):
     model.eval()
@@ -15,7 +14,7 @@ def evaluate(model, criterion, val_loader, device, tgt_tokenizer):
 
     # Val loss
     with torch.no_grad():
-        with tqdm(val_loader, total=len(val_loader), desc=f'Validation') as pbar:
+        with tqdm(val_loader, total=len(val_loader), desc='Validation') as pbar:
             for batch in pbar:
                 batch = {k: v.to(device) for k, v in batch.items()}
 

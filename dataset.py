@@ -1,10 +1,6 @@
 import torch
 import os
 from torch.utils.data import Dataset
-from tokenizers import Tokenizer
-from tokenizers.models import BPE
-from tokenizers.trainers import BpeTrainer
-from tokenizers.pre_tokenizers import Whitespace
 import torch.nn.functional as F
 
 class TranslationDataset(Dataset):
