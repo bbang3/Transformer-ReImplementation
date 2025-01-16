@@ -16,18 +16,6 @@ def prepare_tokenizer(path, lang, is_target, vocab_size=37000, max_length=256):
     file = os.path.join(path, f'train.{lang}')
     tokenizer.train([file], trainer)
 
-    # tokenizer.enable_padding(pad_id=tokenizer.token_to_id("[PAD]"), pad_token="[PAD]", length=max_length) # max length보다 짧으면 padding
-    # tokenizer.enable_truncation(max_length=max_length) # 길면 truncation (special token 제외)
-    
-    # tokenizer.post_processor = TemplateProcessing(
-    # single="[BOS] $A [EOS]",
-    # special_tokens=[
-    #         ("[BOS]", tokenizer.token_to_id("[BOS]")),
-    #         ("[EOS]", tokenizer.token_to_id("[EOS]")),
-    #     ],
-    # )
-
-
     return tokenizer
 
 def load_tokenizer(path, lang):

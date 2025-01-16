@@ -30,7 +30,6 @@ def parse_argument():
 
     return args
 
-# python main.py --mode train --checkpoint ./checkpoints/model_from_epoch_2_3.pt --run_name from_epoch_3 --tokenizer_path ./tokenizer --lr 1e-4
 if __name__ == "__main__":
     args = parse_argument()
 

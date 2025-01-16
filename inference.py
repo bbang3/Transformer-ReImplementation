@@ -10,7 +10,6 @@ def _generate(model, data_loader, device, tgt_tokenizer):
     model.eval()
     model = model.to(device)
 
-    labels = data_loader.dataset.tgt_sents
     predictions = []
     
     with torch.no_grad():
@@ -23,7 +22,6 @@ def _generate(model, data_loader, device, tgt_tokenizer):
                     
                 enc_inputs = batch['src']
                 dec_inputs = torch.LongTensor([bos_token_id] * enc_inputs.shape[0]).unsqueeze(1).to(device) # (bs, 1)
-                label = batch['tgt'] # (bs, seq_len)
 
                 while dec_inputs.shape[-1] <= data_loader.dataset.max_length:
                     output = model(enc_inputs, dec_inputs) # (bs, seq_len, dec_vocab_size)
@@ -43,7 +41,6 @@ def generate(model, data_loader, device, tgt_tokenizer):
     model.eval()
     model = model.to(device)
 
-    labels = data_loader.dataset.tgt_sents
     predictions = []
 
     with torch.no_grad():
@@ -56,7 +53,6 @@ def generate(model, data_loader, device, tgt_tokenizer):
                     
                 enc_inputs = batch['src']
                 dec_inputs = torch.LongTensor([bos_token_id] * enc_inputs.shape[0]).unsqueeze(1).to(device) # (bs, 1)
-                label = batch['tgt'] # (bs, seq_len)
 
                 while dec_inputs.shape[-1] <= data_loader.dataset.max_length:
                     output = model(enc_inputs, dec_inputs) # (bs, seq_len, dec_vocab_size)

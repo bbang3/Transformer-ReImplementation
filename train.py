@@ -18,12 +18,9 @@ def train(args, model, optimizer, criterion, train_loader, val_loader, device, t
                 enc_inputs, dec_inputs, labels = batch['src'], batch['tgt'], batch['label'] # (bs, seq_len)
                 outputs = model(enc_inputs, dec_inputs) # (bs, seq_len, dec_vocab_size)
 
-                # decoded = tgt_tokenizer.decode(outputs[0].argmax(dim=-1).tolist())
-                # print(len(decoded), decoded)
                 outputs = outputs.contiguous().view(-1, outputs.shape[-1]) # (bs * seq_len, dec_vocab_size)
                 labels = labels.contiguous().view(-1) # (bs * seq_len)
 
-                # print(outputs.shape, labels.shape)
                 loss = criterion(outputs, labels)
                 losses.append(loss.item())
 
