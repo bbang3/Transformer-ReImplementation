@@ -1,9 +1,12 @@
-import torch
-from tqdm import tqdm
+import os
+
 import numpy as np
+import torch
 import wandb
+from tqdm import tqdm
 
 from eval import evaluate
+
 
 def train(args, model, optimizer, criterion, train_loader, val_loader, device, tgt_tokenizer, num_epochs=1):
     model.train()
@@ -38,6 +41,10 @@ def train(args, model, optimizer, criterion, train_loader, val_loader, device, t
             print(e)
             wandb.log({"is_error": 1})
         
-        torch.save(model.state_dict(), f'./checkpoints/model_{args.run_name}_{epoch}.pt')
+        checkpoint_path = './checkpoints/'
+        if not os.path.exists(checkpoint_path):
+            os.makedirs(checkpoint_path)
+            
+        torch.save(model.state_dict(), os.path.join(checkpoint_path, f'model_{args.run_name}_{epoch}.pt'))
         
     return losses
