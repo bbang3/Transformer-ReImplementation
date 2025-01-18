@@ -1,5 +1,8 @@
-# Raw data files
-# data/
+# Outputs
+output/
+
+# Ruff
+.ruff_cache/
 
 # Checkpoints
 checkpoints/
