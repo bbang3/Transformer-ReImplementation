@@ -50,7 +50,7 @@ if __name__ == "__main__":
     val_dataset = TranslationDataset(args.data_path, 'validation', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
-    test_dataset = TranslationDataset(args.data_path, 'validation', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
+    test_dataset = TranslationDataset(args.data_path, 'test', src_tokenizer, tgt_tokenizer, language_pair='en-de', max_length=256)
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
     # print(train_dataset[0])
