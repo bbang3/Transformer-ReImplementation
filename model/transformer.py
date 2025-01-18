@@ -96,12 +96,12 @@ class EncoderLayer(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, vocab_size=37000, num_layers=6, max_len=256, ffn_dim=512, hidden_dim=2048, num_heads=8, eps=1e-5, drop_prob=0.1, device='cpu'):
+    def __init__(self, vocab_size=37000, num_layers=6, max_len=256, embed_dim=512, ffn_dim=2048, num_heads=8, eps=1e-5, drop_prob=0.1, device='cpu'):
         super(Decoder, self).__init__()
 
-        self.pos_encoding = PositionalEncoding(max_len, ffn_dim, device)
-        self.embedding = nn.Embedding(vocab_size, ffn_dim)
-        self.layers = nn.ModuleList([DecoderLayer(ffn_dim, hidden_dim, num_heads, eps, drop_prob) for _ in range(num_layers)])
+        self.pos_encoding = PositionalEncoding(max_len, embed_dim, device)
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.layers = nn.ModuleList([DecoderLayer(embed_dim, ffn_dim, num_heads, eps, drop_prob) for _ in range(num_layers)])
     
     def forward(self, dec_inputs, enc_outputs, self_attn_mask=None, cross_attn_mask=None):
         dec_inputs = self.embedding(dec_inputs)
